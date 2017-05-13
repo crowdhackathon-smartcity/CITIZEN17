@@ -9,13 +9,32 @@ from django.db.models import F
 
 from .models import Consumption, Payments
 
+import json
+
 class UserView(View):
     def get(self, request):
-        pass
+        consumed = Consumption.objects.get(pk=1).consumed
+        response = {
+            'daily': [
+                consumed
+            ]
+        }
+
+        return HttpResponse(json.dumps(response))
 
 class MunicipalityView(View):
     def get(self, request):
-        pass
+        consumed = Consumption.objects.get(pk=1).consumed
+        paid = Payments.objects.get(pk=1).paid
+        response = {
+            'consumed': consumed,
+            'paid': paid,
+            'daily': [
+                consumed
+            ]
+        }
+
+        return HttpResponse(json.dumps(response))
 
 class SensorView(View):
     def post(self, request):
