@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
@@ -9,18 +10,18 @@ urlpatterns = [
         name='municipality'
     ),
     url(
-        r'^user'/,
+        r'^user/',
         views.UserView.as_view(),
         name='user'
     ),
     url(
         r'^sensor/',
-        views.SensorView.as_view(),
+        csrf_exempt(views.SensorView.as_view()),
         name='sensor'
     ),
     url(
         r'^payment/',
-        views.PaymentView.as_view(),
+        csrf_exempt(views.PaymentView.as_view()),
         name='sensor'
     ),
 ]
