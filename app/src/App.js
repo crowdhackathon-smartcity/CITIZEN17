@@ -19,11 +19,34 @@ class App extends Component {
 
         this.state = {
             daily: [],
+            balance: localStorage.getItem('balance') || 35,
+            todaySpent: 0,
+            monthSpent: 0,
         };
     }
 
-    fetchData = () => {
+    fetchData = (initialRequest) => {
         fetch('/user/').then(stats => {;
+            if (this.fetched) {
+                stats.daily = [12];
+            }
+            this.fetched = true;
+            const todaySpent = stats.daily[stats.daily.length - 1];
+            const monthSpent = stats.daily.reduce((a, b) => a + b, 0);
+
+            stats.todaySpent = todaySpent;
+            stats.monthSpent = monthSpent;
+
+            if (!initialRequest) {
+                const prevStats = this.state;
+
+                if (prevStats.todaySpent < stats.todaySpent) {
+                    stats.balance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
+                    localStorage.setItem('balance', stats.balance);
+                    // TODO: trigger transaction
+                }
+            }
+
             this.setState(stats);
         }).catch(err => {
             console.log(err);
@@ -58,7 +81,7 @@ class App extends Component {
     }
 
     componentWillMount() {
-        this.fetchData();
+        this.fetchData(true);
         this.updateInterval = setInterval(this.fetchData, 2000);
     }
 
@@ -94,9 +117,6 @@ class App extends Component {
             }
         };
 
-        const todayBalance = this.state.daily[this.state.daily.length - 1];
-        const monthBalance = this.state.daily.reduce((a, b) => a + b, 0);
-
         return (
             <div className='App'>
                 <AppBar
@@ -106,7 +126,7 @@ class App extends Component {
 				<Card style={balanceCardStyle}>
 					<CardTitle>Υπόλοιπο</CardTitle>
 					<CardText style={balanceStyle}>
-						<FormattedNumber value={23.42} style='currency' currency='EUR' />
+						<FormattedNumber value={this.state.balance} style='currency' currency='EUR' />
                         <FloatingActionButton mini={true} style={balanceUpdateStyle}>
                             <ContentAdd />
                         </FloatingActionButton>
@@ -117,7 +137,7 @@ class App extends Component {
 					<CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='green'>
-                            <FormattedNumber value={todayBalance || 0} style='currency' currency='EUR' />
+                            <FormattedNumber value={this.state.todaySpent || 0} style='currency' currency='EUR' />
                         </span>
 					</CardText>
 				</Card>
@@ -126,7 +146,7 @@ class App extends Component {
 					<CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα</CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='red' style={{marginBottom: '20px', display: 'block'}}>
-                            <FormattedNumber value={monthBalance || 0} style='currency' currency='EUR' />
+                            <FormattedNumber value={this.state.monthSpent || 0} style='currency' currency='EUR' />
                         </span>
                         <div style={{padding: '0px', marginLeft: '-25px', fontWeight: 'normal', fontSize: '13px'}}>
                             <BarChart width={350} height={100} data={this.fixGraphData()}>
