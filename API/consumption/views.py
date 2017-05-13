@@ -9,22 +9,38 @@ from django.db.models import F
 
 from .models import Consumption, Payments
 
-import json
+import json, datetime
+
+
+def getConsumed():
+    year = datetime.datetime.now().year
+    month = 03
+    consumed_qset = Consumption.objects.filter(
+        date__year__gte=year,
+        date__month__gte=month
+    )
+
+    consumed = []
+    for cons in consumed_qset:
+        consumed.append(cons.consumed)
+
+    return consumed
+
 
 class UserView(View):
     def get(self, request):
-        consumed = Consumption.objects.get(pk=1).consumed
+        consumed = getConsumed()
+
         data = {
-            'daily': [
-                consumed
-            ]
+            'daily': consumed
         }
 
         return JsonResponse(data)
 
+
 class MunicipalityView(View):
     def get(self, request):
-        consumed = Consumption.objects.get(pk=1).consumed
+        consumed = getConsumed()
         paid = Payments.objects.get(pk=1).paid
         data = {
             'consumed': consumed,
@@ -36,15 +52,18 @@ class MunicipalityView(View):
 
         return JsonResponse(data)
 
+
 class SensorView(View):
     def post(self, request):
-        consumption = Consumption.objects.filter(pk=1)
+        date = "2017-03-" + str(datetime.datetime.now().day)
+        consumption = Consumption.objects.filter(date=date)
         try:
             consumption.update(consumed=F('consumed') + int(request.POST['consumed']))
         except TypeError:
             print "error: consumed is not an integer"
 
         return HttpResponse()
+
 
 class PaymentView(View):
     def post(self, request):
