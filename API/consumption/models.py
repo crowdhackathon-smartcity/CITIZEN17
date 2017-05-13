@@ -5,6 +5,10 @@ from django.db import models
 
 class Consumption(models.Model):
     consumed = models.PositiveIntegerField()
-
-class Payments(models.Model):
     paid = models.PositiveIntegerField()
+    date = models.DateField()
+
+class User(models.Model):
+    consumed = models.PositiveIntegerField()
+    paid = models.PositiveIntegerField()
+    date = models.DateField()
