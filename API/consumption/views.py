@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
 
 from django.db.models import F
@@ -14,19 +14,19 @@ import json
 class UserView(View):
     def get(self, request):
         consumed = Consumption.objects.get(pk=1).consumed
-        response = {
+        data = {
             'daily': [
                 consumed
             ]
         }
 
-        return HttpResponse(json.dumps(response))
+        return JsonResponse(data)
 
 class MunicipalityView(View):
     def get(self, request):
         consumed = Consumption.objects.get(pk=1).consumed
         paid = Payments.objects.get(pk=1).paid
-        response = {
+        data = {
             'consumed': consumed,
             'paid': paid,
             'daily': [
@@ -34,7 +34,7 @@ class MunicipalityView(View):
             ]
         }
 
-        return HttpResponse(json.dumps(response))
+        return JsonResponse(data)
 
 class SensorView(View):
     def post(self, request):
