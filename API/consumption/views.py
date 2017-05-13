@@ -7,29 +7,54 @@ from django.views.generic import View
 
 from django.db.models import F
 
-from .models import Consumption, Payments
+from .models import Consumption, User
 
 import json, datetime
 
 
-def getConsumed():
+def getConsumptionQset():
     year = datetime.datetime.now().year
-    month = 03
+    month = datetime.datetime.now().month
     consumed_qset = Consumption.objects.filter(
         date__year__gte=year,
         date__month__gte=month
     )
 
+    return consumed_qset
+
+
+def getConsumed():
+    consumption_qset = getConsumptionQset()
+
     consumed = []
-    for cons in consumed_qset:
+    for cons in consumption_qset:
         consumed.append(cons.consumed)
 
     return consumed
 
 
+def getPaid():
+    consumption_qset = getConsumptionQset()
+
+    paid = []
+    for cons in consumption_qset:
+        paid.append(cons.paid)
+
+    return paid
+
+
 class UserView(View):
     def get(self, request):
-        consumed = getConsumed()
+        now = datetime.datetime.now()
+
+        user_qset = User.objects.filter(
+            date__year__gte=now.year,
+            date__month__gte=now.month
+        )
+
+        consumed = []
+        for user in user_qset:
+            consumed.append(user.consumed)
 
         data = {
             'daily': consumed
@@ -41,9 +66,9 @@ class UserView(View):
 class MunicipalityView(View):
     def get(self, request):
         consumed = getConsumed()
-        paid = Payments.objects.get(pk=1).paid
+        paid = sum(getPaid())
         data = {
-            'consumed': consumed,
+            'consumed': sum(consumed),
             'paid': paid,
             'daily': [
                 consumed
@@ -55,10 +80,12 @@ class MunicipalityView(View):
 
 class SensorView(View):
     def post(self, request):
-        date = "2017-03-" + str(datetime.datetime.now().day)
+        date = datetime.datetime.now()
         consumption = Consumption.objects.filter(date=date)
+        user = User.objects.filter(date=date)
         try:
             consumption.update(consumed=F('consumed') + int(request.POST['consumed']))
+            #user.update(consumed=F('consumed') + int(request.POST['consumed']))
         except TypeError:
             print "error: consumed is not an integer"
 
@@ -67,10 +94,11 @@ class SensorView(View):
 
 class PaymentView(View):
     def post(self, request):
-        payment = Payments.objects.filter(pk=1)
+        date = datetime.datetime.now()
+        consumption = Consumption.objects.filter(date=date)
         try:
-            payment.update(paid=F('paid') + int(request.POST['paid']))
+            consumption.update(paid=F('paid') + int(request.POST['paid']))
         except TypeError:
-            print "error: paid is not an integer"
+            print "error: consumed is not an integer"
 
         return HttpResponse()
