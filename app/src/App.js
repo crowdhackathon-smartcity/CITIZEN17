@@ -1,17 +1,67 @@
+/* eslint-disable */
+
 import React, { Component } from 'react';
 import AppBar from 'material-ui/AppBar';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import {List, ListItem} from 'material-ui/List';
+import {fetch} from './utils/api';
 import './App.css';
 import {FormattedNumber} from 'react-intl';
 import {Card, CardTitle, CardText} from 'material-ui/Card';
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-import Divider from 'material-ui/Divider';
+import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
+
 injectTapEventPlugin();
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            daily: [],
+        };
+    }
+
+    fetchData = () => {
+        fetch('/user/').then(stats => {;
+            this.setState(stats);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    fixGraphData() {
+        let graphData = [];
+
+        this.state.daily.forEach((item, index) => {
+            graphData.push({
+                name: index + 1, // date
+                consumption: item
+            });
+        });
+
+        const items = graphData.length;
+        if (items < 31) {
+            for (let i = items + 1; i <= 31; ++i) {
+                graphData.push({
+                    name: i, // date
+                    consumption: 0
+                });
+            }
+        }
+
+        return graphData;
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.updateInterval);
+    }
+
+    componentWillMount() {
+        this.fetchData();
+        this.updateInterval = setInterval(this.fetchData, 2000);
+    }
+
     render() {
 		const balanceStyle = {
 			fontSize: 25,
@@ -44,39 +94,8 @@ class App extends Component {
             }
         };
 
-		const data = [
-			  {name: '1', uv: 3},
-			  {name: '2', uv: 1},
-			  {name: '3', uv: 2},
-			  {name: '4', uv: 1.5},
-			  {name: '5', uv: 2.2},
-			  {name: '6', uv: 1.8},
-			  {name: '7', uv: 1.5},
-			  {name: '8', uv: 2.11},
-			  {name: '9', uv: 2},
-			  {name: '10', uv: 1.9},
-			  {name: '11', uv: 2.8},
-			  {name: '12', uv: 2.3},
-			  {name: '13', uv: 1.3},
-			  {name: '14', uv: 2.8},
-			  {name: '15', uv: 0},
-			  {name: '16', uv: 0},
-			  {name: '17', uv: 0},
-			  {name: '18', uv: 0},
-			  {name: '19', uv: 0},
-			  {name: '20', uv: 0},
-			  {name: '21', uv: 0},
-			  {name: '22', uv: 0},
-			  {name: '23', uv: 0},
-			  {name: '24', uv: 0},
-			  {name: '25', uv: 0},
-			  {name: '26', uv: 0},
-			  {name: '27', uv: 0},
-			  {name: '28', uv: 0},
-			  {name: '29', uv: 0},
-			  {name: '30', uv: 0},
-			  {name: '31', uv: 0},
-		];
+        const todayBalance = this.state.daily[this.state.daily.length - 1];
+        const monthBalance = this.state.daily.reduce((a, b) => a + b, 0);
 
         return (
             <div className='App'>
@@ -98,7 +117,7 @@ class App extends Component {
 					<CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='green'>
-                            <FormattedNumber value={2.8} style='currency' currency='EUR' />
+                            <FormattedNumber value={todayBalance || 0} style='currency' currency='EUR' />
                         </span>
 					</CardText>
 				</Card>
@@ -107,11 +126,11 @@ class App extends Component {
 					<CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα</CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='red' style={{marginBottom: '20px', display: 'block'}}>
-                            <FormattedNumber value={15.42} style='currency' currency='EUR' />
+                            <FormattedNumber value={monthBalance || 0} style='currency' currency='EUR' />
                         </span>
                         <div style={{padding: '0px', marginLeft: '-25px', fontWeight: 'normal', fontSize: '13px'}}>
-                            <BarChart width={350} height={100} data={data}>
-                                <Bar dataKey='uv' fill='#00bcd4'/>
+                            <BarChart width={350} height={100} data={this.fixGraphData()}>
+                                <Bar dataKey='consumption' fill='#00bcd4' isAnimationActive={false} />
                                 <XAxis dataKey="name"/>
                                 <YAxis/>
                             </BarChart>
