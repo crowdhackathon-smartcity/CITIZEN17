@@ -99,4 +99,4 @@ class PaymentView(View):
         except TypeError:
             print "error: consumed is not an integer"
 
-        return HttpResponse()
+        return HttpResponse("Payment successful")
