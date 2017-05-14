@@ -27,6 +27,7 @@ class App extends Component {
             monthSpent: 0,
             loggedIn: true,
             notificationOpen: false,
+            leak: false,
         };
     }
 
@@ -59,6 +60,10 @@ class App extends Component {
                 if (prevStats.todaySpent < stats.todaySpent) {
                     let newBalance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
                     stats.notificationOpen = true;
+                    if (stats.todaySpent - prevStats.todaySpent >= 1000) {
+                        stats.leak = true;
+                    }
+
                     localStorage.setItem('balance', newBalance);
                     let balanceUpdateInterval = setInterval(() => {
                         if (this.state.balance !== newBalance) {
@@ -148,6 +153,15 @@ class App extends Component {
                 <div>
                     <AppBar title='' /> <Card style={balanceCardStyle}> <CardTitle>Υπόλοιπο</CardTitle> <CardText style={balanceStyle}> <FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' /> <FloatingActionButton mini={true} style={balanceUpdateStyle}> <ContentAdd /> </FloatingActionButton> </CardText>
                     </Card>
+
+                    {this.state.leak ? (
+                    <Card style={{background: '#f2dede', color: '#a94442'}}>
+                        <CardTitle style={{color: '#a94442'}}><i className="material-icons">warning</i>Πιθανότητα Διαρροής</CardTitle>
+                        <CardText style={{color: '#a94442'}}>
+                            Εντοπίστηκε συνεχής αυξημένη ροή νερού.
+                        </CardText>
+                    </Card>
+                    ) : (null)}
 
                     <Card style={subCardsStyles.cardStyle}>
                         <CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
