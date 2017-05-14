@@ -22,3 +22,15 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+span.red {
+    color: red;
+}
+ 
+span.green {
+    color: green;
+}
+
+.list > div:nth-child(odd) {
+    background: #eee;
+}

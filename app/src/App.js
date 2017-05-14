@@ -10,6 +10,7 @@ import {Card, CardTitle, CardText} from 'material-ui/Card';
 import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
+import $ from 'jquery';
 
 injectTapEventPlugin();
 
@@ -19,7 +20,7 @@ class App extends Component {
 
         this.state = {
             daily: [],
-            balance: localStorage.getItem('balance') || 35,
+            balance: localStorage.getItem('balance') || 0,
             todaySpent: 0,
             monthSpent: 0,
         };
@@ -27,10 +28,13 @@ class App extends Component {
 
     fetchData = (initialRequest) => {
         fetch('/user/').then(stats => {;
+            /*
             if (this.fetched) {
-                stats.daily = [12];
+                stats.daily = [400];
             }
             this.fetched = true;
+            */
+
             const todaySpent = stats.daily[stats.daily.length - 1];
             const monthSpent = stats.daily.reduce((a, b) => a + b, 0);
 
@@ -41,8 +45,16 @@ class App extends Component {
                 const prevStats = this.state;
 
                 if (prevStats.todaySpent < stats.todaySpent) {
-                    stats.balance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
-                    localStorage.setItem('balance', stats.balance);
+                    let newBalance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
+                    localStorage.setItem('balance', newBalance);
+                    let balanceUpdateInterval = setInterval(() => {
+                        if (this.state.balance !== newBalance) {
+                            const balance = this.state.balance - 1;
+                            this.setState({balance});
+                        } else {
+                            clearInterval(balanceUpdateInterval);
+                        }
+                    }, 5);
                     // TODO: trigger transaction
                 }
             }
@@ -59,7 +71,7 @@ class App extends Component {
         this.state.daily.forEach((item, index) => {
             graphData.push({
                 name: index + 1, // date
-                consumption: item
+                consumption: item / 100
             });
         });
 
@@ -126,7 +138,7 @@ class App extends Component {
 				<Card style={balanceCardStyle}>
 					<CardTitle>Υπόλοιπο</CardTitle>
 					<CardText style={balanceStyle}>
-						<FormattedNumber value={this.state.balance} style='currency' currency='EUR' />
+						<FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' />
                         <FloatingActionButton mini={true} style={balanceUpdateStyle}>
                             <ContentAdd />
                         </FloatingActionButton>
@@ -137,19 +149,19 @@ class App extends Component {
 					<CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='green'>
-                            <FormattedNumber value={this.state.todaySpent || 0} style='currency' currency='EUR' />
+                            <FormattedNumber value={this.state.todaySpent / 100 || 0} style='currency' currency='EUR' />
                         </span>
 					</CardText>
 				</Card>
 
 				<Card style={subCardsStyles.cardStyle}>
-					<CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα</CardTitle>
+					<CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα<br /><strong style={{marginTop: '5px', display: 'block'}}>1 Μαΐου - 31 Μαΐου</strong></CardTitle>
 					<CardText style={subCardsStyles.balanceStyle}>
                         <span className='red' style={{marginBottom: '20px', display: 'block'}}>
-                            <FormattedNumber value={this.state.monthSpent || 0} style='currency' currency='EUR' />
+                            <FormattedNumber value={this.state.monthSpent / 100|| 0} style='currency' currency='EUR' />
                         </span>
                         <div style={{padding: '0px', marginLeft: '-25px', fontWeight: 'normal', fontSize: '13px'}}>
-                            <BarChart width={350} height={100} data={this.fixGraphData()}>
+                            <BarChart width={$(window).width() - 20} height={100} data={this.fixGraphData()}>
                                 <Bar dataKey='consumption' fill='#00bcd4' isAnimationActive={false} />
                                 <XAxis dataKey="name"/>
                                 <YAxis/>
