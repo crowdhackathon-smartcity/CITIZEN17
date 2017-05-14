@@ -6,12 +6,12 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import {fetch} from './utils/api';
 import './App.css';
 import {FormattedNumber} from 'react-intl';
-import http from 'http';
 import {Card, CardTitle, CardText} from 'material-ui/Card';
 import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Login from "./Login";
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
+import axios from 'axios';
 import $ from 'jquery';
 import Snackbar from 'material-ui/Snackbar';
 
@@ -69,7 +69,7 @@ class App extends Component {
 
                     if (!this.state.paid) {
                         stats.paid = true;
-                        http.get('http://dionyziz.com:3001/pay');
+                        axios.post('http://vitsalis.com:8009/pay').then(() => {}).catch(() => {});
                     }
 
                     localStorage.setItem('balance', newBalance);
