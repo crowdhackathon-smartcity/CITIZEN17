@@ -25,7 +25,7 @@ class App extends Component {
             balance: localStorage.getItem('balance') || 0,
             todaySpent: 0,
             monthSpent: 0,
-            loggedIn: true,
+            loggedIn: false,
             notificationOpen: false,
             leak: false,
         };

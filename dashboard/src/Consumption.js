@@ -104,6 +104,20 @@ class Consumption extends Component { timerId = 0;
                         <XAxis dataKey="name"/>
                         <YAxis/>
                     </BarChart>
+
+                    <Card style={{background: '#f2dede', color: '#a94442', marginTop: '50px'}}>
+                        <CardTitle style={{color: '#a94442', fontSize: '20px'}}>
+                            <i
+                                style={{position: 'relative', top: '5px', left:
+                                '-10px'}}
+                                className="material-icons">warning
+                            </i>
+                            Πιθανότητα Διαρροής
+                        </CardTitle>
+                        <CardText style={{color: '#a94442', fontSize: '17px'}}>
+                            Εντοπίστηκε συνεχής αυξημένη ροή νερού στην οδό <strong>Ασκληπιού</strong>.
+                        </CardText>
+                    </Card>
                 </CardText>
             </Card>
         );
