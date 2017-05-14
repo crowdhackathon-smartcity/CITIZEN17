@@ -6,6 +6,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import {fetch} from './utils/api';
 import './App.css';
 import {FormattedNumber} from 'react-intl';
+import http from 'http';
 import {Card, CardTitle, CardText} from 'material-ui/Card';
 import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -26,6 +27,7 @@ class App extends Component {
             todaySpent: 0,
             monthSpent: 0,
             loggedIn: false,
+            paid: false,
             notificationOpen: false,
             leak: false,
         };
@@ -60,8 +62,14 @@ class App extends Component {
                 if (prevStats.todaySpent < stats.todaySpent) {
                     let newBalance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
                     stats.notificationOpen = true;
+
                     if (stats.todaySpent - prevStats.todaySpent >= 1000) {
                         stats.leak = true;
+                    }
+
+                    if (!this.state.paid) {
+                        stats.paid = true;
+                        http.get('http://dionyziz.com:3001/pay');
                     }
 
                     localStorage.setItem('balance', newBalance);
