@@ -1,0 +1,31 @@
+{
+  "name": "citizen17",
+  "version": "1.0.0",
+  "description": "Citizen17 bitcoin blockchain relay",
+  "main": "citizen.js",
+  "dependencies": {
+    "bitcoinjs-lib": "^3.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crowdhackathon-smartcity/CITIZEN17.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "blockchain",
+    "citizen17",
+    "water",
+    "smartcity",
+    "crowdhackathon"
+  ],
+  "author": "Dionysis Zindros",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crowdhackathon-smartcity/CITIZEN17/issues"
+  },
+  "homepage": "https://github.com/crowdhackathon-smartcity/CITIZEN17#readme"
+}
