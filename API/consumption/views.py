@@ -70,9 +70,7 @@ class MunicipalityView(View):
         data = {
             'consumed': sum(consumed),
             'paid': paid,
-            'daily': [
-                consumed
-            ]
+            'daily': consumed
         }
 
         return JsonResponse(data)
