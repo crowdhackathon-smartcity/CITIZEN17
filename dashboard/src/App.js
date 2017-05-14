@@ -1,26 +1,40 @@
 import React, { Component } from 'react';
 
 import Consumption from "./Consumption"
+import Login from "./Login"
 import AppBar from 'material-ui/AppBar';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import FlatButton from 'material-ui/FlatButton';
 import './App.css';
 
-import http from "http"
-
 injectTapEventPlugin();
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            loggedIn: false,
+        };
+    }
+
+    login = () => {
+        this.setState({loggedIn: true});
+    }
+
     render() {
         return (
             <div className="App">
-                <AppBar
-                    title='Διαχείριση Νερού'
-                    iconElementRight={<FlatButton label="Δημος Τρικκαιων" />}
-                    style={{textAlign: 'left'}}
-                />
+                {this.state.loggedIn ? (
+                <div>
+                    <AppBar
+                        title='Διαχείριση Νερού'
+                        iconElementRight={<FlatButton label="Δημος Τρικκαιων" />}
+                        style={{textAlign: 'left'}}
+                    />
 
-                <Consumption />
+                    <Consumption />
+                </div>) : (<Login onSubmit={this.login} />)}
             </div>
         );
     }

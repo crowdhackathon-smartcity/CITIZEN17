@@ -30,7 +30,6 @@ class Consumption extends Component { timerId = 0;
         fetch('/municipality/').then(stats => {;
             stats.monthSpent = stats.consumed;
             stats.monthPaid = stats.paid;
-            stats.daily = stats.daily[0];
 
             this.setState(stats);
         }).catch(err => {
