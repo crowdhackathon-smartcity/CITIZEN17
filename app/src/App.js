@@ -156,7 +156,14 @@ class App extends Component {
 
                     {this.state.leak ? (
                     <Card style={{background: '#f2dede', color: '#a94442'}}>
-                        <CardTitle style={{color: '#a94442'}}><i className="material-icons">warning</i>Πιθανότητα Διαρροής</CardTitle>
+                        <CardTitle style={{color: '#a94442'}}>
+                            <i
+                                style={{position: 'relative', top: '5px', left:
+                                '-10px'}}
+                                className="material-icons">warning
+                            </i>
+                            Πιθανότητα Διαρροής
+                        </CardTitle>
                         <CardText style={{color: '#a94442'}}>
                             Εντοπίστηκε συνεχής αυξημένη ροή νερού.
                         </CardText>
