@@ -9,6 +9,7 @@ import {FormattedNumber} from 'react-intl';
 import {Card, CardTitle, CardText} from 'material-ui/Card';
 import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Login from "./Login";
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
 import $ from 'jquery';
 
@@ -23,7 +24,12 @@ class App extends Component {
             balance: localStorage.getItem('balance') || 0,
             todaySpent: 0,
             monthSpent: 0,
+            loggedIn: false,
         };
+    }
+
+    login = () => {
+        this.setState({loggedIn: true});
     }
 
     fetchData = (initialRequest) => {
@@ -131,44 +137,37 @@ class App extends Component {
 
         return (
             <div className='App'>
-                <AppBar
-                    title=''
-                />
+                {this.state.loggedIn ? (
+                <div>
+                    <AppBar title='' /> <Card style={balanceCardStyle}> <CardTitle>Υπόλοιπο</CardTitle> <CardText style={balanceStyle}> <FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' /> <FloatingActionButton mini={true} style={balanceUpdateStyle}> <ContentAdd /> </FloatingActionButton> </CardText>
+                    </Card>
 
-				<Card style={balanceCardStyle}>
-					<CardTitle>Υπόλοιπο</CardTitle>
-					<CardText style={balanceStyle}>
-						<FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' />
-                        <FloatingActionButton mini={true} style={balanceUpdateStyle}>
-                            <ContentAdd />
-                        </FloatingActionButton>
-					</CardText>
-				</Card>
+                    <Card style={subCardsStyles.cardStyle}>
+                        <CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
+                        <CardText style={subCardsStyles.balanceStyle}>
+                            <span className='green'>
+                                <FormattedNumber value={this.state.todaySpent / 100 || 0} style='currency' currency='EUR' />
+                            </span>
+                        </CardText>
+                    </Card>
 
-				<Card style={subCardsStyles.cardStyle}>
-					<CardTitle style={{padding: '10px'}}>Σημερινή κατανάλωση</CardTitle>
-					<CardText style={subCardsStyles.balanceStyle}>
-                        <span className='green'>
-                            <FormattedNumber value={this.state.todaySpent / 100 || 0} style='currency' currency='EUR' />
-                        </span>
-					</CardText>
-				</Card>
-
-				<Card style={subCardsStyles.cardStyle}>
-					<CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα<br /><strong style={{marginTop: '5px', display: 'block'}}>1 Μαΐου - 31 Μαΐου</strong></CardTitle>
-					<CardText style={subCardsStyles.balanceStyle}>
-                        <span className='red' style={{marginBottom: '20px', display: 'block'}}>
-                            <FormattedNumber value={this.state.monthSpent / 100|| 0} style='currency' currency='EUR' />
-                        </span>
-                        <div style={{padding: '0px', marginLeft: '-25px', fontWeight: 'normal', fontSize: '13px'}}>
-                            <BarChart width={$(window).width() - 20} height={100} data={this.fixGraphData()}>
-                                <Bar dataKey='consumption' fill='#00bcd4' isAnimationActive={false} />
-                                <XAxis dataKey="name"/>
-                                <YAxis/>
-                            </BarChart>
-                        </div>
-					</CardText>
-				</Card>
+                    <Card style={subCardsStyles.cardStyle}>
+                        <CardTitle style={{padding: '10px'}}>Συνολική κατανάλωση του μήνα<br /><strong style={{marginTop: '5px', display: 'block'}}>1 Μαΐου - 31 Μαΐου</strong></CardTitle>
+                        <CardText style={subCardsStyles.balanceStyle}>
+                            <span className='red' style={{marginBottom: '20px', display: 'block'}}>
+                                <FormattedNumber value={this.state.monthSpent / 100|| 0} style='currency' currency='EUR' />
+                            </span>
+                            <div style={{padding: '0px', marginLeft: '-25px', fontWeight: 'normal', fontSize: '13px'}}>
+                                <BarChart width={$(window).width() - 20} height={100} data={this.fixGraphData()}>
+                                    <Bar dataKey='consumption' fill='#00bcd4' isAnimationActive={false} />
+                                    <XAxis dataKey="name"/>
+                                    <YAxis/>
+                                </BarChart>
+                            </div>
+                        </CardText>
+                    </Card>
+                </div>
+                ) : (<Login onSubmit={this.login}/>)}
             </div>
         );
     }
