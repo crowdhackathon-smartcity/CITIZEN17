@@ -12,6 +12,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Login from "./Login";
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
 import $ from 'jquery';
+import Snackbar from 'material-ui/Snackbar';
 
 injectTapEventPlugin();
 
@@ -24,12 +25,17 @@ class App extends Component {
             balance: localStorage.getItem('balance') || 0,
             todaySpent: 0,
             monthSpent: 0,
-            loggedIn: false,
+            loggedIn: true,
+            notificationOpen: false,
         };
     }
 
     login = () => {
         this.setState({loggedIn: true});
+    }
+
+    handleNotificationClose = () => {
+        this.setState({notificationOpen: false});
     }
 
     fetchData = (initialRequest) => {
@@ -52,6 +58,7 @@ class App extends Component {
 
                 if (prevStats.todaySpent < stats.todaySpent) {
                     let newBalance = prevStats.balance - (stats.todaySpent - prevStats.todaySpent);
+                    stats.notificationOpen = true;
                     localStorage.setItem('balance', newBalance);
                     let balanceUpdateInterval = setInterval(() => {
                         if (this.state.balance !== newBalance) {
@@ -124,7 +131,7 @@ class App extends Component {
         const subCardsStyles = {
             cardStyle: {
                 fontSize: 13,
-                marginBottom: '10px',
+                marginBottom: '5px',
             },
 
             balanceStyle: {
@@ -166,6 +173,13 @@ class App extends Component {
                             </div>
                         </CardText>
                     </Card>
+
+					<Snackbar
+						open={this.state.notificationOpen}
+						message="Ολοκληρώθηκε χρέωση για κατανάλωση νερού"
+                        onRequestClose={this.handleNotificationClose}
+						autoHideDuration={4000}
+					/>
                 </div>
                 ) : (<Login onSubmit={this.login}/>)}
             </div>
