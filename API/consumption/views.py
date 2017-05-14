@@ -85,7 +85,7 @@ class SensorView(View):
         user = User.objects.filter(date=date)
         try:
             consumption.update(consumed=F('consumed') + int(request.POST['consumed']))
-            #user.update(consumed=F('consumed') + int(request.POST['consumed']))
+            user.update(consumed=F('consumed') + int(request.POST['consumed']))
         except TypeError:
             print "error: consumed is not an integer"
 
