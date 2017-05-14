@@ -7,8 +7,12 @@ import {fetch} from './utils/api';
 import './App.css';
 import {FormattedNumber} from 'react-intl';
 import {Card, CardTitle, CardText} from 'material-ui/Card';
+import {List, ListItem} from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import FlatButton from 'material-ui/FlatButton';
 import {BarChart, Bar, XAxis, YAxis} from 'recharts';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Dialog from 'material-ui/Dialog';
 import Login from "./Login";
 import ContentAdd from 'material-ui/svg-icons/content/add'; 
 import axios from 'axios';
@@ -29,6 +33,7 @@ class App extends Component {
             loggedIn: false,
             paid: false,
             notificationOpen: false,
+            paymentModalOpen: false,
             leak: false,
         };
     }
@@ -39,6 +44,14 @@ class App extends Component {
 
     handleNotificationClose = () => {
         this.setState({notificationOpen: false});
+    }
+
+    closePaymentModal = () => {
+        this.setState({paymentModalOpen: false});
+    }
+
+    showPaymentModal = () => {
+        this.setState({paymentModalOpen: true});
     }
 
     fetchData = (initialRequest) => {
@@ -155,12 +168,41 @@ class App extends Component {
             }
         };
 
+		const actions = [
+			<FlatButton
+				label="Cancel"
+				primary={true}
+				onTouchTap={this.closePaymentModal}
+			/>,
+		];
+
         return (
             <div className='App'>
                 {this.state.loggedIn ? (
                 <div>
-                    <AppBar title='' /> <Card style={balanceCardStyle}> <CardTitle>Υπόλοιπο</CardTitle> <CardText style={balanceStyle}> <FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' /> <FloatingActionButton mini={true} style={balanceUpdateStyle}> <ContentAdd /> </FloatingActionButton> </CardText>
+                    <AppBar title='' /> <Card style={balanceCardStyle}> <CardTitle>Υπόλοιπο</CardTitle> <CardText style={balanceStyle}> <FormattedNumber value={this.state.balance / 100} style='currency' currency='EUR' /> <FloatingActionButton onClick={this.showPaymentModal} mini={true} style={balanceUpdateStyle}> <ContentAdd /> </FloatingActionButton> </CardText>
                     </Card>
+                    <Dialog
+                        title="Τρόπος πληρωμής"
+                        actions={actions}
+                        modal={false}
+                        open={this.state.paymentModalOpen}
+                        onRequestClose={this.closePaymentModal}
+                    >
+						<List style={{textAlign: 'center'}}>
+							<ListItem style={{marginTop: '20px'}}>
+                                <img src='/credit-card-logos.png' style={{maxWidth: '80%'}} />
+                            </ListItem>
+                            <Divider />
+							<ListItem>
+                                <img src='/paypal.png' style={{maxWidth: '80%'}} />
+                            </ListItem>
+                            <Divider />
+							<ListItem>
+                                <img src='/bitcoin.png' style={{maxWidth: '80%'}} />
+                            </ListItem>
+						</List>
+                    </Dialog>
 
                     {this.state.leak ? (
                     <Card style={{background: '#f2dede', color: '#a94442'}}>
