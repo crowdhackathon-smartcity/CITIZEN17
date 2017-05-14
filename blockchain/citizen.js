@@ -4,7 +4,8 @@ var request = require('request');
 var express = require('express');
 var app = express();
 
-var PORT = 3001;
+var PORT = 8009;
+var HOST = '0.0.0.0';
 var TX_FEE = 37000;
 var TX_VALUE = 40000;
 
@@ -46,7 +47,9 @@ function getUnspentHistory(addr, cb) {
     });
 }
 
-app.get('/pay', function(req, res) {
+app.post('/pay', function(req, res) {
+    console.log('Received payment request');
+
     getUnspentHistory(citizenAddress, function(txId, outputIdx, value) {
         console.log('Spending transaction');
 
@@ -79,7 +82,7 @@ app.get('/pay', function(req, res) {
 
         // Print transaction serialized as hex
         var txhex = tx.build().toHex();
-        var txid = tx.getId();
+        var txid = tx.build().getId();
 
         console.log('Transaction hex: ');
         console.log(txhex);
@@ -90,6 +93,21 @@ app.get('/pay', function(req, res) {
         // pushtx(txhex);
         console.log('Transaction broadcasted');
         console.log('Transaction id: ', txid);
+
+        informpayment();
+
+        function informpayment() {
+            request.post({
+                    url: 'http://vitsalis.com:8010/payment/',
+                    form: {
+                        paid: 100
+                    }
+                },
+                (err, resp, body) => {
+                    console.log('Payment result: ', body);
+                }
+            );
+        }
 
         function pushtx(txhex) {
             // Now push the transaction onto the Bitcoin network manually
@@ -107,11 +125,13 @@ app.get('/pay', function(req, res) {
                 }
             );
         }
+
+        res.send('Payment successful');
     });
 });
 
 console.log('Crowdhackathon SmartCity CITIZEN17 blockchain connection');
 
-app.listen(PORT, function() {
-    console.log('Express listening for payment requests on port ', PORT);
+app.listen(PORT, HOST, function() {
+    console.log('Express listening for payment requests on ', HOST, ':', PORT);
 });
